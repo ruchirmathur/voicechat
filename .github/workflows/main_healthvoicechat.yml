@@ -71,24 +71,31 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E21F2FE58BEB48C68BE38E5CC9A81D1F }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0FEA34FBD5064889B05DC7C229EAB685 }}
 
+      - name: Set Azure App Service application settings from GitHub secrets
+        uses: Azure/appservice-settings@v1
+        with:
+          app-name: 'healthvoicechat'
+          app-settings-json: |
+            [
+              { "name": "AZURE_OPENAI_ENDPOINT", "value": "${{ secrets.AZURE_OPENAI_ENDPOINT }}" },
+              { "name": "AZURE_OPENAI_REALTIME_DEPLOYMENT", "value": "${{ secrets.AZURE_OPENAI_REALTIME_DEPLOYMENT }}" },
+              { "name": "AZURE_OPENAI_API_KEY", "value": "${{ secrets.AZURE_OPENAI_API_KEY }}" },
+              { "name": "AZURE_OPENAI_REALTIME_VOICE_CHOICE", "value": "${{ secrets.AZURE_OPENAI_REALTIME_VOICE_CHOICE }}" },
+              { "name": "AZURE_SEARCH_ENDPOINT", "value": "${{ secrets.AZURE_SEARCH_ENDPOINT }}" },
+              { "name": "AZURE_SEARCH_INDEX", "value": "${{ secrets.AZURE_SEARCH_INDEX }}" },
+              { "name": "AZURE_SEARCH_API_KEY", "value": "${{ secrets.AZURE_SEARCH_API_KEY }}" },
+              { "name": "AZURE_SEARCH_SEMANTIC_CONFIGURATION", "value": "${{ secrets.AZURE_SEARCH_SEMANTIC_CONFIGURATION }}" },
+              { "name": "AZURE_SEARCH_IDENTIFIER_FIELD", "value": "${{ secrets.AZURE_SEARCH_IDENTIFIER_FIELD }}" },
+              { "name": "AZURE_SEARCH_TITLE_FIELD", "value": "${{ secrets.AZURE_SEARCH_TITLE_FIELD }}" },
+              { "name": "AZURE_SEARCH_CONTENT_FIELD", "value": "${{ secrets.AZURE_SEARCH_CONTENT_FIELD }}" },
+              { "name": "AZURE_SEARCH_EMBEDDING_FIELD", "value": "${{ secrets.AZURE_SEARCH_EMBEDDING_FIELD }}" },
+              { "name": "AZURE_SEARCH_USE_VECTOR_QUERY", "value": "${{ secrets.AZURE_SEARCH_USE_VECTOR_QUERY }}" },
+              { "name": "AZURE_TENANT_ID", "value": "${{ secrets.AZURE_TENANT_ID }}" }
+            ]
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
-        env:
-          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-          AZURE_OPENAI_REALTIME_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_REALTIME_DEPLOYMENT }}
-          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          AZURE_OPENAI_REALTIME_VOICE_CHOICE: ${{ secrets.AZURE_OPENAI_REALTIME_VOICE_CHOICE }}
-          AZURE_SEARCH_ENDPOINT: ${{ secrets.AZURE_SEARCH_ENDPOINT }}
-          AZURE_SEARCH_INDEX: ${{ secrets.AZURE_SEARCH_INDEX }}
-          AZURE_SEARCH_API_KEY: ${{ secrets.AZURE_SEARCH_API_KEY }}
-          AZURE_SEARCH_SEMANTIC_CONFIGURATION: ${{ secrets.AZURE_SEARCH_SEMANTIC_CONFIGURATION }}
-          AZURE_SEARCH_IDENTIFIER_FIELD: ${{ secrets.AZURE_SEARCH_IDENTIFIER_FIELD }}
-          AZURE_SEARCH_TITLE_FIELD: ${{ secrets.AZURE_SEARCH_TITLE_FIELD }}
-          AZURE_SEARCH_CONTENT_FIELD: ${{ secrets.AZURE_SEARCH_CONTENT_FIELD }}
-          AZURE_SEARCH_EMBEDDING_FIELD: ${{ secrets.AZURE_SEARCH_EMBEDDING_FIELD }}
-          AZURE_SEARCH_USE_VECTOR_QUERY: ${{ secrets.AZURE_SEARCH_USE_VECTOR_QUERY }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         with:
           app-name: 'healthvoicechat'
           slot-name: 'Production'
