@@ -64,7 +64,6 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -75,7 +74,21 @@ jobs:
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
+        env:
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_REALTIME_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_REALTIME_DEPLOYMENT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_REALTIME_VOICE_CHOICE: ${{ secrets.AZURE_OPENAI_REALTIME_VOICE_CHOICE }}
+          AZURE_SEARCH_ENDPOINT: ${{ secrets.AZURE_SEARCH_ENDPOINT }}
+          AZURE_SEARCH_INDEX: ${{ secrets.AZURE_SEARCH_INDEX }}
+          AZURE_SEARCH_API_KEY: ${{ secrets.AZURE_SEARCH_API_KEY }}
+          AZURE_SEARCH_SEMANTIC_CONFIGURATION: ${{ secrets.AZURE_SEARCH_SEMANTIC_CONFIGURATION }}
+          AZURE_SEARCH_IDENTIFIER_FIELD: ${{ secrets.AZURE_SEARCH_IDENTIFIER_FIELD }}
+          AZURE_SEARCH_TITLE_FIELD: ${{ secrets.AZURE_SEARCH_TITLE_FIELD }}
+          AZURE_SEARCH_CONTENT_FIELD: ${{ secrets.AZURE_SEARCH_CONTENT_FIELD }}
+          AZURE_SEARCH_EMBEDDING_FIELD: ${{ secrets.AZURE_SEARCH_EMBEDDING_FIELD }}
+          AZURE_SEARCH_USE_VECTOR_QUERY: ${{ secrets.AZURE_SEARCH_USE_VECTOR_QUERY }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         with:
           app-name: 'healthvoicechat'
           slot-name: 'Production'
-          
