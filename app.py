@@ -1,10 +1,13 @@
 import logging
 import os
+import asyncio
 from pathlib import Path
+
 from aiohttp import web
 from azure.core.credentials import AzureKeyCredential
 from azure.identity import AzureDeveloperCliCredential, DefaultAzureCredential
 from dotenv import load_dotenv
+
 from ragtools import attach_rag_tools
 from rtmt import RTMiddleTier
 
@@ -80,12 +83,11 @@ async def create_app():
 
     return app
 
-# For Gunicorn/Azure: expose an app instance via an event loop
-import asyncio
+# Await the async factory at module level for Gunicorn/Azure
 app = asyncio.get_event_loop().run_until_complete(create_app())
 
 if __name__ == "__main__":
     host = "localhost"
     port = 8000
-    # Use asyncio.run to get the app instance for local run
+    # For local development, use asyncio.run
     web.run_app(asyncio.run(create_app()), host=host, port=port)
