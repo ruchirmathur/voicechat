@@ -31,7 +31,18 @@ async def create_app():
             credential = DefaultAzureCredential()
     llm_credential = AzureKeyCredential(llm_key) if llm_key else credential
     search_credential = AzureKeyCredential(search_key) if search_key else credential
-    
+
+    # Check for required environment variables
+    required_vars = [
+        "AZURE_OPENAI_ENDPOINT",
+        "AZURE_OPENAI_REALTIME_DEPLOYMENT",
+        "AZURE_SEARCH_ENDPOINT",
+        "AZURE_SEARCH_INDEX"
+    ]
+    for var in required_vars:
+        if var not in os.environ:
+            raise ValueError(f"Missing required environment variable: {var}")
+
     app = web.Application()
 
     rtmt = RTMiddleTier(
@@ -39,7 +50,7 @@ async def create_app():
         endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
         deployment=os.environ["AZURE_OPENAI_REALTIME_DEPLOYMENT"],
         voice_choice=os.environ.get("AZURE_OPENAI_REALTIME_VOICE_CHOICE") or "alloy"
-        )
+    )
     rtmt.system_message = """
         You are a helpful assistant. Only answer questions based on information you searched in the knowledge base, accessible with the 'search' tool. 
         The user is listening to answers with audio, so it's *super* important that answers are as short as possible, a single sentence if at all possible. 
@@ -50,7 +61,8 @@ async def create_app():
         3. Produce an answer that's as short as possible. If the answer isn't in the knowledge base, say you don't know.
     """.strip()
 
-    attach_rag_tools(rtmt,
+    attach_rag_tools(
+        rtmt,
         credentials=search_credential,
         search_endpoint=os.environ.get("AZURE_SEARCH_ENDPOINT"),
         search_index=os.environ.get("AZURE_SEARCH_INDEX"),
@@ -60,17 +72,22 @@ async def create_app():
         embedding_field=os.environ.get("AZURE_SEARCH_EMBEDDING_FIELD") or "text_vector",
         title_field=os.environ.get("AZURE_SEARCH_TITLE_FIELD") or "title",
         use_vector_query=(os.getenv("AZURE_SEARCH_USE_VECTOR_QUERY", "true") == "true")
-        )
+    )
 
     rtmt.attach_to_app(app, "/realtime")
 
     current_directory = Path(__file__).parent
     app.add_routes([web.get('/', lambda _: web.FileResponse(current_directory / 'static/index.html'))])
     app.router.add_static('/', path=current_directory / 'static', name='static')
-    
+
     return app
+
+# For Gunicorn/Azure: expose an app instance via an event loop
+import asyncio
+app = asyncio.get_event_loop().run_until_complete(create_app())
 
 if __name__ == "__main__":
     host = "localhost"
     port = 8000
-    web.run_app(create_app(), host=host, port=port)
+    # Use asyncio.run to get the app instance for local run
+    web.run_app(asyncio.run(create_app()), host=host, port=port)
