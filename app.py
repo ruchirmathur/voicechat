@@ -72,5 +72,5 @@ async def create_app():
 
 if __name__ == "__main__":
     host = "localhost"
-    port = 8765
+    port = 8000
     web.run_app(create_app(), host=host, port=port)
