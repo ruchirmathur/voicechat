@@ -83,11 +83,11 @@ async def create_app():
 
     return app
 
-# Await the async factory at module level for Gunicorn/Azure
-app = asyncio.get_event_loop().run_until_complete(create_app())
+# Production: resolve the async app at import time for Gunicorn/Azure
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+app = loop.run_until_complete(create_app())
 
 if __name__ == "__main__":
-    host = "localhost"
-    port = 8000
-    # For local development, use asyncio.run
-    web.run_app(asyncio.run(create_app()), host=host, port=port)
+    # Local development: use asyncio.run
+    web.run_app(asyncio.run(create_app()), host="localhost", port=8000)
