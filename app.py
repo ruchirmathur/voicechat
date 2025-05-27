@@ -1,7 +1,6 @@
 import logging
 import os
 from pathlib import Path
-
 from aiohttp import web
 from azure.core.credentials import AzureKeyCredential
 from azure.identity import AzureDeveloperCliCredential, DefaultAzureCredential
